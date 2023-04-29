@@ -1,29 +1,50 @@
 import nltk
-nltk.download('punkt')
+# nltk.download('punkt')
 from nltk.corpus import wordnet
-nltk.download('averaged_perceptron_tagger')
-nltk.download('wordnet')
-theme = "Nature"
+from syllables import estimate
 
-haiku_poems = ["The old pond, a frog jumps in, sound of water.", 
-               "Cherry blossoms bloom, softly falling petals, the spring breeze.", 
-               "Winter solitude--in a world of one color the sound of wind."]
+# nltk.download('averaged_perceptron_tagger')
+# nltk.download('wordnet')
+# nltk.download('stopwords')
+
+theme = "love"
+with open('haiku_data.txt', 'r') as f:
+    # Read the contents of the file
+    contents = f.read()
+
+# Split the contents of the file based on '$' and remove any empty strings
+haiku_poems = [string for string in contents.split('$') if string]
 
 tokens = [nltk.word_tokenize(poem.lower()) for poem in haiku_poems]
-words = [word for token in tokens for word in token]
+words = [word for token in tokens for word in token if word != '/']
 nouns = [word for (word, pos) in nltk.pos_tag(words) if pos.startswith("NN")]
 freq_dist = nltk.FreqDist(nouns)
 common_nouns = freq_dist.most_common(10)
+#do something with nouns later
+# for noun in nouns:
 
-synonyms = []
-for word, freq in common_nouns:
-    syns = wordnet.synsets(word, pos='n')
-    for syn in syns:
-        for lemma in syn.lemmas():
-            synonyms.append(lemma.name())
-similar_words = set(synonyms)
+# Get the synsets for the the current thmee for now
+synsets = wordnet.synsets(theme, pos='n')
+similar_words = set()
+for synset in synsets:
+    for lemma in synset.lemmas():
+        similar_words.add(lemma.name())
 
-# Step 5: Test for relevance
-for word in similar_words:
-    print(word)
+syllables_dict = {word: estimate(word) for word in similar_words}
 
+def syllableSum(syllables_dict, target):
+    complement_dict = {}
+    for key, value in syllables_dict.items():
+        complement = target - value
+        if complement in complement_dict:
+            return [complement_dict[complement], key]
+        complement_dict[value] = key
+    return []
+
+five_syll = syllableSum(syllables_dict, 5)
+print("haiku: ")
+print(five_syll)
+print("\n")
+
+for x in five_syll:
+    print(x + "is" + str(estimate(x)) + "syllables")
