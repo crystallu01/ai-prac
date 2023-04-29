@@ -1,6 +1,7 @@
 import random
 from nltk.corpus import wordnet
 from syllables import estimate
+import regex as re
 
 # nltk.download('punkt')
 # nltk.download('averaged_perceptron_tagger')
@@ -30,6 +31,7 @@ def get_syllables(word):
 
 def line_syllables(line):
     total_syll = 0
+    line = [x for x in re.findall(r"[a-z]+", line.lower())]
     for x in line:
         total_syll += estimate(x)
     return total_syll
@@ -47,17 +49,19 @@ for line in lines:
 def generate_haiku(model, structure):
     haiku = []
     for syllables in structure:
+        print(syllables)
         line = ""
         while line == "":
-          word = model.make_sentence(max_overlap_ratio = 0.3)
-          if word != None:
-              haiku_line = word.split(".")
-              print(haiku_line)
-
-              #haiku line is a 
-              for l in haiku_line:
-                  if line_syllables(l) == syllables:
-                      line = l
+            #word returns a list of words
+            word = model.make_sentence(max_overlap_ratio = 0.3)
+            if word != None:
+                haiku_line = word.split(".")
+                #haiku line is a string of words
+                for l in haiku_line:
+                    if line_syllables(l) == syllables:
+                        line = l
+                        print(line)
+                        break
         haiku.append(line)
     return haiku
 
