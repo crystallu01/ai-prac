@@ -1,11 +1,13 @@
 import nltk
-# nltk.download('punkt')
 from nltk.corpus import wordnet
 from syllables import estimate
 
+# nltk.download('punkt')
 # nltk.download('averaged_perceptron_tagger')
 # nltk.download('wordnet')
 # nltk.download('stopwords')
+nltk.download('cmudict')
+
 
 theme = "love"
 with open('haiku_data.txt', 'r') as f:
@@ -24,13 +26,14 @@ common_nouns = freq_dist.most_common(10)
 # for noun in nouns:
 
 # Get the synsets for the the current thmee for now
-synsets = wordnet.synsets(theme, pos='n')
-similar_words = set()
-for synset in synsets:
-    for lemma in synset.lemmas():
-        similar_words.add(lemma.name())
-
-syllables_dict = {word: estimate(word) for word in similar_words}
+def synonyms(theme):
+    synsets = wordnet.synsets(theme, pos='n')
+    similar_words = set()
+    for synset in synsets:
+        for lemma in synset.lemmas():
+            similar_words.add(lemma.name())
+    syllables_dict = {word: estimate(word) for word in similar_words}
+    return syllables_dict
 
 def syllableSum(syllables_dict, target):
     complement_dict = {}
@@ -41,10 +44,13 @@ def syllableSum(syllables_dict, target):
         complement_dict[value] = key
     return []
 
+syllables_dict = synonyms(theme)
 five_syll = syllableSum(syllables_dict, 5)
 print("haiku: ")
 print(five_syll)
 print("\n")
 
+total_syl = 0
 for x in five_syll:
-    print(x + "is" + str(estimate(x)) + "syllables")
+    print(x + " is " + str(estimate(x)) + " syllables")
+    total_syl += estimate(x)
