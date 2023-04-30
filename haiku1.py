@@ -2,6 +2,7 @@ import random
 from nltk.corpus import wordnet
 from syllables import estimate
 import regex as re
+import spacy
 
 # nltk.download('punkt')
 # nltk.download('averaged_perceptron_tagger')
@@ -10,20 +11,23 @@ import regex as re
 
 # Define the haiku structure as three lines with syllable counts
 haiku_structure = [5, 7, 5]
+nlp = spacy.load('en_core_web_sm')
 
 # Load a corpus of haikus and split them into lines
 with open("haiku_data.txt") as f:
     lines = [line.strip() for line in f]
 
+#theme = input()
+theme = "rain"
 
-# Get the synsets for the the current thmee for now
+# Get the synsets for the the current theme for now
 def synonyms(theme):
     synsets = wordnet.synsets(theme, pos='n')
     similar_words = set()
     for synset in synsets:
         for lemma in synset.lemmas():
             similar_words.add(lemma.name())
-    similar_words
+    return similar_words
 
 # Define a function to get the syllable count of a word using a syllable dictionary
 def get_syllables(word):
@@ -36,6 +40,15 @@ def line_syllables(line):
         total_syll += estimate(x)
     return total_syll
 
+def line_syn(line, theme):
+    words = [x for x in re.findall(r"[a-z]+", line.lower())]
+    for word in words: 
+        tokens = nlp(word + " " + theme)
+        similarity = tokens[0].similarity(tokens[1])
+        if similarity > 0.4:
+            return True
+
+    return False
 
 # Create a dictionary of syllable counts for each word in the corpus
 syllable_dict = {}
@@ -49,7 +62,6 @@ for line in lines:
 def generate_haiku(model, structure):
     haiku = []
     for syllables in structure:
-        print(syllables)
         line = ""
         while line == "":
             #word returns a list of words
@@ -58,7 +70,7 @@ def generate_haiku(model, structure):
                 haiku_line = word.split(".")
                 #haiku line is a string of words
                 for l in haiku_line:
-                    if line_syllables(l) == syllables:
+                    if line_syllables(l) == syllables and line_syn(l, theme):
                         line = l
                         print(line)
                         break
