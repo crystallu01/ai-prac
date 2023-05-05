@@ -79,9 +79,12 @@ def generate_haiku(model, structure):
 
 # Train a Markov chain language model on the corpus of haikus
 from markovify import NewlineText
+from markov import Markov
+model = Markov(lines)
+print(f'Make sentences: {model.make_sentences()}')
 model = NewlineText("\n".join(lines))
 
 # Generate a haiku using the model and the defined structure
 haiku = generate_haiku(model, haiku_structure)
 
-# print(haiku)
+print(haiku)
