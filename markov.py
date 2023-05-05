@@ -19,17 +19,28 @@ class Markov:
                             chain[word].append(next_word)
         self.chain = chain
 
-    def make_sentences(self):
-        MIN_LEN = 3
-        starter_word = random.choice(list(self.chain.keys()))
-        acc = [starter_word]
-        current_word = starter_word
-        while True:
-            next_word = random.choice(self.chain[current_word])
-            if next_word == '$' and len(acc) < MIN_LEN:
-                continue
-            acc.append(next_word)
-            current_word = next_word
-            if current_word == '$' and len(acc) >= MIN_LEN:
-                break
-        return ' '.join(acc)
+    def _select_next_word(self, min_length, cur_word, cur_length):
+        if cur_length > min_length and '$' in self.chain[cur_word]:
+            return '$'
+        return random.choice(self.chain[cur_word])
+
+    def make_sentences(self, total_sentences=3, min_length=5):
+        sentences = []
+        for _ in range(total_sentences):
+            # starter_word = random.choice(list(self.chain.keys()))
+            starter_word = 'rain'
+            acc = [starter_word]
+            current_word = starter_word
+            while current_word != '$':
+                # horrible
+                try:
+                    next_word = self._select_next_word(min_length, current_word, len(acc))
+                    if next_word == '$' and len(acc) < min_length:
+                        continue
+                except KeyError:
+                    break
+                acc.append(next_word)
+                current_word = next_word
+
+            sentences.append(' '.join(acc))
+        return sentences
