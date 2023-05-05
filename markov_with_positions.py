@@ -10,14 +10,18 @@ class Markov:
     def _build(self):
         print('Building...')
         chain = defaultdict(lambda: [[] for _ in range(13)])
+        starting_words = []
         for poem in self.poems_from_data:
             for line in poem.split(' . '):
                 words = line.split(' ')
                 for index, word in enumerate(words):
+                    if index == 0:
+                        starting_words.append(word)
                     if index + 1 < len(words):
                         next_word = words[index+1]
                         chain[word][index].append(next_word)
         self.chain = chain
+        self.starting_words = starting_words
 
     def _select_next_word(self, length_threshold, cur_word, cur_length):
         # return 
@@ -31,11 +35,11 @@ class Markov:
             i += 1
         raise Exception
 
-    def make_sentences(self, total_sentences=1, length_threshold=10):
+    def make_sentences(self, total_sentences=2, length_threshold=10):
         print('Making sentences...')
         sentences = []
         for _ in range(total_sentences):
-            starter_word = random.choice(list(self.chain.keys()))
+            starter_word = random.choice(self.starting_words)
             # starter_word = 'rain'
             acc = [starter_word]
             current_word = starter_word
