@@ -35,24 +35,24 @@ class Markov:
             i += 1
         raise Exception
 
-    def make_sentences(self, total_sentences=2, length_threshold=10):
-        print('Making sentences...')
-        sentences = []
-        for _ in range(total_sentences):
-            starter_word = random.choice(self.starting_words)
-            # starter_word = 'rain'
-            acc = [starter_word]
-            current_word = starter_word
-            while current_word != '$':
-                # horrible
-                try:
-                    next_word = self._select_next_word(length_threshold, current_word, len(acc))
-                    # below code causes infinite loops when using positions
-                    # if next_word == '$' and len(acc) < approx_length:
-                    #     continue
-                except Exception:
-                    break
-                acc.append(next_word)
-                current_word = next_word
-            sentences.append(' '.join(acc))
-        return sentences
+    def make_sentence(self, total_sentences=1, length_threshold=10):
+        # print('Making sentences...')
+        # sentences = []
+        # for _ in range(total_sentences):
+        starter_word = random.choice(self.starting_words)
+        # starter_word = 'rain'
+        acc = [starter_word]
+        current_word = starter_word
+        while current_word != '$':
+            # horrible
+            try:
+                next_word = self._select_next_word(length_threshold, current_word, len(acc))
+                # below code causes infinite loops when using positions
+                # if next_word == '$' and len(acc) < approx_length:
+                #     continue
+            except Exception:
+                break
+            acc.append(next_word)
+            current_word = next_word
+            # sentences.append(' '.join(acc))
+        return ' '.join(acc)
