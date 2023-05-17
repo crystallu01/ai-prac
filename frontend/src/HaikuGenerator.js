@@ -1,18 +1,23 @@
 import React, { useState } from 'react';
 
-const haikuAPI = 'https://haiku-api.com/api/random';
+const haikuAPI = 'http://127.0.0.1:5000/poem';
 
 const HaikuGenerator = () => {
   const [haiku, setHaiku] = useState('');
   const [prompt, setPrompt] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const generateHaiku = async () => {
-    // const response = await fetch(`${haikuAPI}?prompt=${prompt}`);
-    // const data = await response.json();
-    // setHaiku(data.text);
-    setHaiku(
-      'sunshine tornado / atmosphere forecast climate / tornado lightning'
-    );
+    setLoading(true);
+    const response = await fetch(`${haikuAPI}/${prompt}/`);
+    const data = await response.json();
+    console.log(data.results);
+    const cleaned_poem = data.results.map((line, index) => {
+      let new_line = line.replace('$', '');
+      return new_line + ' / ';
+    });
+    setHaiku(cleaned_poem);
+    setLoading(false);
   };
 
   const styles = {
@@ -70,7 +75,7 @@ const HaikuGenerator = () => {
       />
       <br />
       <button onClick={generateHaiku} style={styles.button}>
-        Generate Haiku
+        {loading ? 'Loading...' : 'Generate Haiku'}
       </button>
       <p style={styles.haiku}>{haiku}</p>
     </div>
