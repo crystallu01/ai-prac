@@ -1,0 +1,4 @@
+nltk
+syllapy
+spacy
+scikit-learn
